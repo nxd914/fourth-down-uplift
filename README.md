@@ -14,7 +14,7 @@ This project applies **causal uplift modeling** to NFL fourth-down decisions to 
 
 The analysis uses NFL play-by-play data filtered to fourth-down situations. Each observation represents a unique fourth-down decision and includes:
 
-* `yardline_100`: yards from the opponent’s end zone
+* `yardline_100`: yards from the opponent's end zone
 * `ydstogo`: yards required for a first down
 * `score_differential`: offensive team score minus defensive team score
 * `game_seconds_remaining`: seconds remaining in the game
@@ -38,11 +38,9 @@ We model expected win probability under two counterfactual actions:
 
 Separate supervised learning models are trained to estimate:
 
-[
-\mathbb{E}[WP \mid X, \text{GO}] \quad \text{and} \quad \mathbb{E}[WP \mid X, \text{KICK}]
-]
+$$\mathbb{E}[WP \mid X, \text{GO}] \quad \text{and} \quad \mathbb{E}[WP \mid X, \text{KICK}]$$
 
-where ( X ) represents the observed game state.
+where $X$ represents the observed game state.
 
 Gradient-boosted regression models are used due to their ability to capture nonlinear interactions between field position, time, score, and distance.
 
@@ -52,9 +50,7 @@ Gradient-boosted regression models are used due to their ability to capture nonl
 
 The **uplift** from going for it is defined as:
 
-[
-\text{Uplift}(X) = \mathbb{E}[WP \mid X, \text{GO}] - \mathbb{E}[WP \mid X, \text{KICK}]
-]
+$$\text{Uplift}(X) = \mathbb{E}[WP \mid X, \text{GO}] - \mathbb{E}[WP \mid X, \text{KICK}]$$
 
 * **Positive uplift** indicates that going for it improves expected win probability.
 * **Negative uplift** indicates that a conservative decision is preferable.
@@ -71,7 +67,7 @@ For each fourth-down situation:
 
 * Games are resampled with replacement
 * Uplift is recomputed across bootstrap samples
-* A confidence interval ([ \text{uplift}*{lo}, \text{uplift}*{hi} ]) is constructed
+* A confidence interval $[\text{uplift}_{\text{lo}}, \text{uplift}_{\text{hi}}]$ is constructed
 
 This avoids overconfidence and preserves dependence structure within games.
 
@@ -83,9 +79,7 @@ This avoids overconfidence and preserves dependence structure within games.
 
 We evaluate a simple, conservative decision rule:
 
-[
-\textbf{GO if } \text{uplift}_{lo}(X) > 0; \quad \textbf{otherwise retain the original decision}
-]
+$$\textbf{GO if } \text{uplift}_{\text{lo}}(X) > 0; \quad \textbf{otherwise retain the original decision}$$
 
 * The **lower bound** of the uplift interval is used as a safety filter
 * This ensures recommendations are robust to estimation noise
@@ -99,15 +93,12 @@ For each decision:
 * If the policy recommends GO, the expected uplift is added to observed win probability
 * Otherwise, win probability is unchanged
 
-[
-WP_{\text{policy}} =
-\begin{cases}
-WP + \text{uplift}_{mean}, & \text{if policy recommends GO} \
+$$WP_{\text{policy}} = \begin{cases}
+WP + \text{uplift}_{\text{mean}}, & \text{if policy recommends GO} \\
 WP, & \text{otherwise}
-\end{cases}
-]
+\end{cases}$$
 
-The difference ( WP_{\text{policy}} - WP ) represents the expected win probability gained by following the policy.
+The difference $WP_{\text{policy}} - WP$ represents the expected win probability gained by following the policy.
 
 ---
 
